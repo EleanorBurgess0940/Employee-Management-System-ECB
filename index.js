@@ -55,10 +55,10 @@ async function mainMenu() {
         //   name: "Remove Role",
         //   value: "removeRole",
         // },
-        // {
-        //   name: "View All Departments",
-        //   value: "viewAllDepartments",
-        // },
+        {
+          name: "View All Departments",
+          value: "viewAllDepartments",
+        },
         // {
         //   name: "Add Department",
         //   value: "addDepartment",
@@ -78,6 +78,8 @@ async function mainMenu() {
   switch (choice) {
     case "viewEmployees":
       return viewEmployees();
+    case "viewAllDepartments":
+      return viewDepartments();
     case "quit":
       return quit();
   }
@@ -92,6 +94,14 @@ async function viewEmployees() {
   mainMenu();
 }
 
+async function viewDepartments() {
+  const departments = await db.findAllDepartments();
+
+  console.log("\n");
+  console.table(departments);
+
+  mainMenu();
+}
 function quit() {
   console.log("Goodbye!");
   process.exit();

@@ -13,6 +13,7 @@
   "author": "Elly Burgess",
   "license": "ISC",
   "dependencies": {
+    "express-generator": "^4.16.1",
     "inquirer": "^7.1.0",
     "modules": "^0.4.0",
     "mysql": "^2.18.1",

@@ -109,6 +109,11 @@ async function addEmployee() {
     value: id,
   }));
 
+  const employees = await db.findAllRoles();
+  const managerChoices = employees.map(({ id }) => ({
+    value: id,
+  }));
+
   const employee = await prompt([
     {
       name: "first_name",
@@ -123,6 +128,12 @@ async function addEmployee() {
       name: "role_id",
       message: "What is the employee's role?",
       choices: roleChoices,
+    },
+    {
+      type: "list",
+      name: "manager_id",
+      message: "Who is the employees manager if needed?",
+      choices: managerChoices,
     },
   ]);
 

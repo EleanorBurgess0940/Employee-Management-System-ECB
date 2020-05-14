@@ -11,10 +11,27 @@ class DB {
     );
   }
 
+  createEmployee(employee) {
+    return this.connection.query("INSERT INTO employee SET ?", employee);
+  }
+
+  findAllRoles() {
+    return this.connection.query(
+      "SELECT role.id, role.title, role.salary, department.name AS department FROM role LEFT JOIN department on role.department_id = department.id"
+    );
+  }
+
+  createRole(role) {
+    return this.connection.query("INSERT INTO role SET ?", role);
+  }
+
   findAllDepartments() {
     return this.connection.query(
       "SELECT department.id, department.name AS department FROM department"
     );
+  }
+  createDepartment(department) {
+    return this.connection.query("INSERT INTO department SET ?", department);
   }
 }
 module.exports = new DB(connection);

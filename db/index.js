@@ -50,5 +50,11 @@ class DB {
   createDepartment(department) {
     return this.connection.query("INSERT INTO department SET ?", department);
   }
+  deleteDepartment(departmentId) {
+    return this.connection.query(
+      "DELETE FROM department WHERE id = ?",
+      departmentId
+    );
+  }
 }
 module.exports = new DB(connection);

@@ -1,13 +1,17 @@
+//required npm package and database
 const { prompt } = require("inquirer");
 const db = require("./db");
 
 init();
 
+//function that starts the command line
 function init() {
-  console.log("hello");
+  console.log("Hello, How are you today?");
+  console.log("Employee Tracker System");
   mainMenu();
 }
 
+//main menu all functions lead back to this
 async function mainMenu() {
   const { choice } = await prompt([
     {
@@ -19,14 +23,6 @@ async function mainMenu() {
           name: "View All Employees",
           value: "viewEmployees",
         },
-        // {
-        //   name: "View All Employees By Department",
-        //   value: "viewEmployeesDepartment",
-        // },
-        // {
-        //   name: "View All Employees By Manager",
-        //   value: "viewEmployeesManager",
-        // },
         {
           name: "Add Employee",
           value: "addEmployee",
@@ -39,10 +35,6 @@ async function mainMenu() {
           name: "Update Employee Role",
           value: "updateEmployeeRole",
         },
-        // {
-        //   name: "Update Employee Manager",
-        //   value: "updateEmployeeManager",
-        // },
         {
           name: "View All Roles",
           value: "viewAllRoles",
@@ -63,10 +55,10 @@ async function mainMenu() {
           name: "Add Department",
           value: "addDepartment",
         },
-        // {
-        //   name: "Remove Department",
-        //   value: "removeDepartment",
-        // },
+        {
+          name: "Remove Department",
+          value: "deleteDepartment",
+        },
         {
           name: "Quit",
           value: "quit",
@@ -74,7 +66,8 @@ async function mainMenu() {
       ],
     },
   ]);
-  console.log(choice);
+
+  //this takes the user input and sends them to the other functions below
   switch (choice) {
     case "viewEmployees":
       return viewEmployees();
@@ -94,33 +87,37 @@ async function mainMenu() {
       return viewDepartments();
     case "addDepartment":
       return addDepartment();
+    case "deleteDepartment":
+      return deleteDepartment();
     case "quit":
       return quit();
   }
 }
 
+//takes the employees from the chart and displays them in a table
 async function viewEmployees() {
   const employees = await db.findAllEmployees();
 
-  console.log("\n");
   console.table(employees);
 
   mainMenu();
 }
 
+//ability to add an employee to the table
 async function addEmployee() {
+  //finds the roles that can be added
   const roles = await db.findAllRoles();
   const roleChoices = roles.map(({ id, title }) => ({
     name: title,
     value: id,
   }));
-
+  //finds the managers available
   const employees = await db.findAllEmployees();
   const managerChoices = employees.map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
     value: id,
   }));
-
+  //questions about the employee
   const employee = await prompt([
     {
       name: "first_name",
@@ -144,6 +141,7 @@ async function addEmployee() {
     },
   ]);
 
+  //sends this information to the function create Employee
   await db.createEmployee(employee);
 
   console.log("The new employee has been added to the database");
@@ -151,13 +149,16 @@ async function addEmployee() {
   mainMenu();
 }
 
+//ability to deleteEmployee
 async function deleteEmployee() {
+  //grabs available employees
   const employees = await db.findAllEmployees();
   const employeesChoices = employees.map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
     value: id,
   }));
 
+  //user input for the deletee
   const { employeeId } = await prompt([
     {
       type: "list",
@@ -167,6 +168,7 @@ async function deleteEmployee() {
     },
   ]);
 
+  //sends this information to the function delete Employee
   await db.deleteEmployee(employeeId);
 
   console.log("The employee has been removed from the database");
@@ -174,18 +176,22 @@ async function deleteEmployee() {
   mainMenu();
 }
 
+//ability to update an Employees Role
 async function updateEmployeeRole() {
+  //grabs employee information
   const employees = await db.findAllEmployees();
   const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
     name: `${first_name} ${last_name}`,
     value: id,
   }));
+  //grabs role information
   const roles = await db.findAllRoles();
   const roleChoices = roles.map(({ id, title }) => ({
     name: title,
     value: id,
   }));
 
+  //grabs information about the update
   const { id } = await prompt([
     {
       type: "list",
@@ -203,7 +209,7 @@ async function updateEmployeeRole() {
       choices: roleChoices,
     },
   ]);
-  console.log(id, roleId);
+  //sends this information to the function update Employee Role
   await db.updateEmployeeRole(id, roleId);
 
   console.log("Updated employee Role");
@@ -211,23 +217,26 @@ async function updateEmployeeRole() {
   mainMenu();
 }
 
+//ability to viewRoles
 async function viewRoles() {
+  //grabs information about roles
   const roles = await db.findAllRoles();
 
-  console.log("\n");
   console.table(roles);
 
   mainMenu();
 }
 
+//ability to addRoles
 async function addRoles() {
+  //grabs departments
   const departments = await db.findAllDepartments();
 
   const departmentChoices = departments.map(({ id, department }) => ({
     name: department,
     value: id,
   }));
-
+  //grabs information about the new roles
   const role = await prompt([
     {
       name: "title",
@@ -244,6 +253,7 @@ async function addRoles() {
       choices: departmentChoices,
     },
   ]);
+  //sends this information to the function create Role
   await db.createRole(role);
 
   console.log("The new role has been added to the database");
@@ -251,13 +261,16 @@ async function addRoles() {
   mainMenu();
 }
 
+//ability to delete Roles
 async function deleteRoles() {
+  //grabs roles from the database
   const roles = await db.findAllRoles();
   const roleChoices = roles.map(({ id, title }) => ({
     name: title,
     value: id,
   }));
 
+  //grabs information about the role about to be deleted
   const { roleId } = await prompt([
     {
       type: "list",
@@ -267,6 +280,7 @@ async function deleteRoles() {
     },
   ]);
 
+  //sends this information to the function delete Role
   await db.deleteRole(roleId);
 
   console.log("The role has been removed from the company");
@@ -274,21 +288,25 @@ async function deleteRoles() {
   mainMenu();
 }
 
+//ability to see the departments
 async function viewDepartments() {
   const departments = await db.findAllDepartments();
 
-  console.log("\n");
   console.table(departments);
 
   mainMenu();
 }
+
+//ability to add departments
 async function addDepartment() {
+  //grabs information about the new department
   const department = await prompt([
     {
       name: "name",
       message: "What is the name of the Department you would like to add?",
     },
   ]);
+  //sends this information to the function create Department
   await db.createDepartment(department);
 
   console.log("The new department has been added to the database");
@@ -296,7 +314,35 @@ async function addDepartment() {
   mainMenu();
 }
 
+//ability to deleteDepartment
+async function deleteDepartment() {
+  //grabs the department information
+  const department = await db.findAllDepartments();
+  const departmentChoices = department.map(({ id, department }) => ({
+    name: department,
+    value: id,
+  }));
+
+  //gathers information about the deleted department
+  const { departmentId } = await prompt([
+    {
+      type: "list",
+      name: "departmentId",
+      message: "What is the department that you would like to remove?",
+      choices: departmentChoices,
+    },
+  ]);
+
+  //sends this information to the function delete Employee
+  await db.deleteDepartment(departmentId);
+
+  console.log("The department has been removed from the company");
+
+  mainMenu();
+}
+//exits out of the main menu
 function quit() {
   console.log("Goodbye!");
+  console.log("Have a nice Day!");
   process.exit();
 }

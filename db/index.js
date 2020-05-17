@@ -19,8 +19,14 @@ class DB {
   }
 
   createEmployee(employee) {
-    console.log("INSERT INTO employee SET ?", employee);
     return this.connection.query("INSERT INTO employee SET ?", employee);
+  }
+
+  deleteEmployee(employeeId) {
+    return this.connection.query(
+      "DELETE FROM employee WHERE id = ?",
+      employeeId
+    );
   }
 
   findAllRoles() {
@@ -33,6 +39,9 @@ class DB {
     return this.connection.query("INSERT INTO role SET ?", role);
   }
 
+  deleteRole(roleId) {
+    return this.connection.query("DELETE FROM role WHERE id = ?", roleId);
+  }
   findAllDepartments() {
     return this.connection.query(
       "SELECT department.id, department.name AS department FROM department"

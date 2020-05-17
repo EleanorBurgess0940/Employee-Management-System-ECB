@@ -31,10 +31,10 @@ async function mainMenu() {
           name: "Add Employee",
           value: "addEmployee",
         },
-        // {
-        //   name: "Remove Employee",
-        //   value: "removeEmployee",
-        // },
+        {
+          name: "Remove Employee",
+          value: "removeEmployee",
+        },
         {
           name: "Update Employee Role",
           value: "updateEmployeeRole",
@@ -51,10 +51,10 @@ async function mainMenu() {
           name: "Add Role",
           value: "addRole",
         },
-        // {
-        //   name: "Remove Role",
-        //   value: "removeRole",
-        // },
+        {
+          name: "Remove Role",
+          value: "deleteRoles",
+        },
         {
           name: "View All Departments",
           value: "viewAllDepartments",
@@ -80,12 +80,16 @@ async function mainMenu() {
       return viewEmployees();
     case "addEmployee":
       return addEmployee();
+    case "removeEmployee":
+      return deleteEmployee();
     case "updateEmployeeRole":
       return updateEmployeeRole();
     case "viewAllRoles":
       return viewRoles();
     case "addRole":
       return addRoles();
+    case "deleteRoles":
+      return deleteRoles();
     case "viewAllDepartments":
       return viewDepartments();
     case "addDepartment":
@@ -143,6 +147,29 @@ async function addEmployee() {
   await db.createEmployee(employee);
 
   console.log("The new employee has been added to the database");
+
+  mainMenu();
+}
+
+async function deleteEmployee() {
+  const employees = await db.findAllEmployees();
+  const employeesChoices = employees.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id,
+  }));
+
+  const { employeeId } = await prompt([
+    {
+      type: "list",
+      name: "employeeId",
+      message: "Who is the employee that needs to be removed?",
+      choices: employeesChoices,
+    },
+  ]);
+
+  await db.deleteEmployee(employeeId);
+
+  console.log("The employee has been removed from the database");
 
   mainMenu();
 }
@@ -220,6 +247,29 @@ async function addRoles() {
   await db.createRole(role);
 
   console.log("The new role has been added to the database");
+
+  mainMenu();
+}
+
+async function deleteRoles() {
+  const roles = await db.findAllRoles();
+  const roleChoices = roles.map(({ id, title }) => ({
+    name: title,
+    value: id,
+  }));
+
+  const { roleId } = await prompt([
+    {
+      type: "list",
+      name: "roleId",
+      message: "What is the role that you would like to remove?",
+      choices: roleChoices,
+    },
+  ]);
+
+  await db.deleteRole(roleId);
+
+  console.log("The role has been removed from the company");
 
   mainMenu();
 }

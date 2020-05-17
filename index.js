@@ -35,10 +35,10 @@ async function mainMenu() {
         //   name: "Remove Employee",
         //   value: "removeEmployee",
         // },
-        // {
-        //   name: "Update Employee Role",
-        //   value: "updateEmployeeRole",
-        // },
+        {
+          name: "Update Employee Role",
+          value: "updateEmployeeRole",
+        },
         // {
         //   name: "Update Employee Manager",
         //   value: "updateEmployeeManager",
@@ -80,6 +80,8 @@ async function mainMenu() {
       return viewEmployees();
     case "addEmployee":
       return addEmployee();
+    case "updateEmployeeRole":
+      return updateEmployeeRole();
     case "viewAllRoles":
       return viewRoles();
     case "addRole":
@@ -109,8 +111,9 @@ async function addEmployee() {
     value: id,
   }));
 
-  const employees = await db.findAllRoles();
-  const managerChoices = employees.map(({ id }) => ({
+  const employees = await db.findAllEmployees();
+  const managerChoices = employees.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
     value: id,
   }));
 
@@ -144,6 +147,43 @@ async function addEmployee() {
   mainMenu();
 }
 
+async function updateEmployeeRole() {
+  const employees = await db.findAllEmployees();
+  const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+    name: `${first_name} ${last_name}`,
+    value: id,
+  }));
+  const roles = await db.findAllRoles();
+  const roleChoices = roles.map(({ id, title }) => ({
+    name: title,
+    value: id,
+  }));
+
+  const { id } = await prompt([
+    {
+      type: "list",
+      name: "id",
+      message: "Which employee would you like to update?",
+      choices: employeeChoices,
+    },
+  ]);
+
+  const { roleId } = await prompt([
+    {
+      type: "list",
+      name: "roleId",
+      message: "Which role would you like to give them?",
+      choices: roleChoices,
+    },
+  ]);
+  console.log(id, roleId);
+  await db.updateEmployeeRole(id, roleId);
+
+  console.log("Updated employee Role");
+
+  mainMenu();
+}
+
 async function viewRoles() {
   const roles = await db.findAllRoles();
 
@@ -156,8 +196,8 @@ async function viewRoles() {
 async function addRoles() {
   const departments = await db.findAllDepartments();
 
-  const departmentChoices = departments.map(({ id, name }) => ({
-    name: name,
+  const departmentChoices = departments.map(({ id, department }) => ({
+    name: department,
     value: id,
   }));
 

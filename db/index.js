@@ -11,7 +11,15 @@ class DB {
     );
   }
 
+  updateEmployeeRole(id, roleId) {
+    return this.connection.query(
+      "UPDATE employee SET role_id = ? WHERE id = ?",
+      [roleId, id]
+    );
+  }
+
   createEmployee(employee) {
+    console.log("INSERT INTO employee SET ?", employee);
     return this.connection.query("INSERT INTO employee SET ?", employee);
   }
 
